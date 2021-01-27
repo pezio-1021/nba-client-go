@@ -3,16 +3,17 @@ package nba
 import (
 	"context"
 	"encoding/json"
-	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"fmt"
+	"errors"
 )
 
 const baseURL = "api-nba-v1.p.rapidapi.com"
+const postURL = "https://api-nba-v1.p.rapidapi.com/"
 
 type Client struct {
 	BaseURL    *url.URL
@@ -39,48 +40,39 @@ func New(Key string, logger *log.Logger) (*Client, error) {
 	}, nil
 }
 
-func (c *Client) NewRequest(ctx context.Context, method, relativePath string, queries, headers map[string]string, reqBody io.Reader) (*http.Request, error) {
-	url := "https://api-nba-v1.p.rapidapi.com/seasons/"
+func (c *Client) GetRequestResult(ctx context.Context, method, relativePath string, queries string, respBody interface{}) (interface{}, error) {
+	req, err := c.MakeRequest(ctx, http.MethodGet, relativePath, "")
+	if err != nil {
+		return nil, err
+	}
+	code, err := c.DoRequest(req, &respBody)
+	if (err != nil) {
+		return 0, err
+	}
 
+	switch code {
+	case http.StatusOK:
+		return respBody, nil
+	case http.StatusBadRequest:
+		return nil, errors.New("bad request. some parameters may be invalid")
+	case http.StatusNotFound:
+		return nil, fmt.Errorf("not found. user with id '%s' may not exist")
+	default:
+		return nil, errors.New("unexpected error1")
+	}
+}
+
+func (c *Client) MakeRequest(ctx context.Context, method, relativePath string, queries string) (*http.Request, error) {
+	
+	url := postURL + relativePath
+	if queries != "" {
+		url = url + queries
+	}
 	req, _ := http.NewRequest("GET", url, nil)
 
     // set header
 	req.Header.Add("x-rapidapi-host", baseURL)
 	req.Header.Add("x-rapidapi-key", c.Key)
-	if headers != nil {
-		for k, v := range headers {
-			req.Header.Set(k, v)
-		}
-	}
-
-
-	
-	
-	// reqURL := *c.BaseURL
-
-	// set path
-	// reqURL.Path = path.Join(reqURL.Path, relativePath)
-	// url := "https://api-nba-v1.p.rapidapi.com/seasons/"
-	// reqURL.Path = url
-	// set query
-	// if queries != nil {
-	// 	q := reqURL.Query()
-	// 	for k, v := range queries {
-	// 		q.Add(k, v)
-	// 	}
-	// 	reqURL.RawQuery = q.Encode()
-	// }
-
-	// instantiate request
-	// req, err := http.NewRequest(method, reqURL.String(), reqBody)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	
-
-	// set context
-	// req = req.WithContext(ctx)
 
 	return req, nil
 }
