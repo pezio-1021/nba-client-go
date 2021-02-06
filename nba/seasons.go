@@ -3,7 +3,6 @@ package nba
 import (
 	"context"
 	"net/http"
-	"fmt"
 )
 
 type Seasons struct {
@@ -21,7 +20,6 @@ func (c *Client) GetSeasons(ctx context.Context) (*interface{}, error) {
 		return nil, err
 	}
 
-	fmt.Println(req)
 	return &req, err
 	
 }

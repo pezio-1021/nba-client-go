@@ -40,8 +40,8 @@ func New(Key string, logger *log.Logger) (*Client, error) {
 	}, nil
 }
 
-func (c *Client) GetRequestResult(ctx context.Context, method, relativePath string, queries string, respBody interface{}) (interface{}, error) {
-	req, err := c.MakeRequest(ctx, http.MethodGet, relativePath, "")
+func (c *Client) GetRequestResult(ctx context.Context, method, relativePath string, querie string, respBody interface{}) (interface{}, error) {
+	req, err := c.MakeRequest(ctx, http.MethodGet, relativePath, querie)
 	if err != nil {
 		return nil, err
 	}
@@ -79,6 +79,7 @@ func (c *Client) MakeRequest(ctx context.Context, method, relativePath string, q
 
 func (c *Client) DoRequest(req *http.Request, respBody interface{}) (int, error) {
 	resp, err := c.HTTPClient.Do(req)
+	fmt.Println(resp)
 	if err != nil {
 		return 0, err
 	}
