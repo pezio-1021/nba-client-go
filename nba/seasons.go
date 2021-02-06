@@ -3,6 +3,7 @@ package nba
 import (
 	"context"
 	"net/http"
+	"fmt"
 )
 
 type Seasons struct {
@@ -11,7 +12,7 @@ type Seasons struct {
     } `json:"api"`
 }
 
-func (c *Client) GetSeasons(ctx context.Context) (interface{}, error) {
+func (c *Client) GetSeasons(ctx context.Context) (*interface{}, error) {
 	relativePath := "seasons/"
 	seasons := new(Seasons)
 	req, err := c.GetRequestResult(ctx,http.MethodGet, relativePath, "", seasons)
@@ -20,6 +21,7 @@ func (c *Client) GetSeasons(ctx context.Context) (interface{}, error) {
 		return nil, err
 	}
 
-	return req, err
+	fmt.Println(req)
+	return &req, err
 	
 }
