@@ -35,5 +35,15 @@ func (c *Client) GetTeamsList(ctx context.Context, league string) (*interface{},
 	}
 
 	return &req, err
-	
+}
+
+func (c *Client) GetTeam(ctx context.Context, teamID string) (*interface{}, error) {
+	relativePath := "teams/teamId/"
+	teams := new(Teams)
+	req, err := c.GetRequestResult(ctx,http.MethodGet, relativePath, teamID, teams)
+	if err != nil {
+		return nil, err
+	}
+
+	return &req, err
 }
